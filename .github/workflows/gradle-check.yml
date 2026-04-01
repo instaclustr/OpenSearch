@@ -22,8 +22,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 130
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit
+
       - name: Checkout OpenSearch repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
@@ -50,7 +55,7 @@ jobs:
           echo "pr_number=Null" >> $GITHUB_ENV
 
       - name: Checkout opensearch-build repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           repository: opensearch-project/opensearch-build
           ref: main
@@ -72,13 +77,13 @@ jobs:
 
       - name: Upload Coverage Report
         if: success()
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
         with:
           files: ./codeCoverage.xml
 
       - name: Create Comment Success
         if: ${{ github.event_name == 'pull_request_target' && success() && env.result == 'SUCCESS' }}
-        uses: peter-evans/create-or-update-comment@v3
+        uses: step-security/create-or-update-comment@a7653e0a4e18093550a274e9c79b7ec6b6dd527e # v5.0.0
         with:
           issue-number: ${{ env.pr_number }}
           body: |
@@ -101,7 +106,7 @@ jobs:
 
       - name: Create Comment Flaky
         if: ${{ github.event_name == 'pull_request_target' && success() && env.result != 'SUCCESS' }}
-        uses: peter-evans/create-or-update-comment@v3
+        uses: step-security/create-or-update-comment@a7653e0a4e18093550a274e9c79b7ec6b6dd527e # v5.0.0
         with:
           issue-number: ${{ env.pr_number }}
           body: |
@@ -111,7 +116,7 @@ jobs:
 
       - name: Create Comment Failure
         if: ${{ github.event_name == 'pull_request_target' && failure() }}
-        uses: peter-evans/create-or-update-comment@v3
+        uses: step-security/create-or-update-comment@a7653e0a4e18093550a274e9c79b7ec6b6dd527e # v5.0.0
         with:
           issue-number: ${{ env.pr_number }}
           body: |
@@ -121,7 +126,7 @@ jobs:
 
       - name: Create Issue On Push Failure
         if: ${{ github.event_name == 'push' && failure() }}
-        uses: dblock/create-a-github-issue@v3
+        uses: dblock/create-a-github-issue@a25e69ccb88998dc267170a0dbde8ef8ac3a491c # v3.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

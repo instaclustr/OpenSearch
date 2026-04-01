@@ -12,16 +12,21 @@ jobs:
     runs-on: ubuntu-latest
     name: Create Documentation Issue
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit
+
       - name: GitHub App token
         id: github_app_token
-        uses: tibdex/github-app-token@v2.1.0
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
           installation_id: 22958780
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         
       - name: Edit the issue template
         run: |
@@ -29,7 +34,7 @@ jobs:
           
       - name: Create Issue From File
         id: create-issue
-        uses: peter-evans/create-issue-from-file@v4
+        uses: step-security/create-issue-from-file@7444673975a4ae46c089644f50930db91fc53e4f # v6.0.0
         with:
           title: Add documentation related to new feature
           content-filepath: ./ci/documentation/issue.md

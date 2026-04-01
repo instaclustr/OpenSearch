@@ -11,7 +11,12 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
@@ -36,7 +41,7 @@ jobs:
           echo "### Compatible components"   >> "${{ github.workspace }}/results.txt" && grep -e 'Compatible component'   $HOME/gradlew-check.out | sed -e 's/Compatible component: \[\(.*\)\]/- \1/'   >> "${{ github.workspace }}/results.txt"
 
       - name: Upload results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3.2.1
         with:
           name: results.txt
           path: ${{ github.workspace }}/results.txt
@@ -47,13 +52,18 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit
+
       - name: Download results
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
         with:
           name: results.txt
 
       - name: Find Comment
-        uses: peter-evans/find-comment@v2
+        uses: step-security/find-comment@1d7bf2a0c1b6802305aa3cf2e7c0e47568915caf # v4.0.0
         id: fc
         with:
           issue-number: ${{ github.event.number }}
@@ -61,7 +71,7 @@ jobs:
           body-includes: 'Compatibility status:'
 
       - name: Add comment on the PR
-        uses: peter-evans/create-or-update-comment@v3
+        uses: step-security/create-or-update-comment@a7653e0a4e18093550a274e9c79b7ec6b6dd527e # v5.0.0
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.number }}
