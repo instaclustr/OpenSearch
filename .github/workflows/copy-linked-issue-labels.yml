@@ -12,8 +12,13 @@ jobs:
       contents: read
       pull-requests: write
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit
+
       - name: copy-issue-labels
-        uses: michalvankodev/copy-issue-labels@v1.3.0
+        uses: michalvankodev/copy-issue-labels@f54e957e58fc976eba5ffa36e1a1030572dbb78d # v1.3.0
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           labels-to-exclude: |

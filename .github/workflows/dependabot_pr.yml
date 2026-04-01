@@ -9,16 +9,21 @@ jobs:
       contents: write
     if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit
+
       - name: GitHub App token
         id: github_app_token
-        uses: tibdex/github-app-token@v2.1.0
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
           installation_id: 22958780
 
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           token: ${{ steps.github_app_token.outputs.token }}
 
@@ -27,7 +32,7 @@ jobs:
           ./gradlew updateSHAs
 
       - name: Commit the changes
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: step-security/git-auto-commit-action@905c3cd6e9ed2b67b4d46ff401fdb6d745d0ff9d # v7.1.0
         with:
           commit_message: Updating SHAs
           branch: ${{ github.head_ref }}
@@ -40,7 +45,7 @@ jobs:
           ./gradlew spotlessApply
 
       - name: Commit the changes
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: step-security/git-auto-commit-action@905c3cd6e9ed2b67b4d46ff401fdb6d745d0ff9d # v7.1.0
         with:
           commit_message: Spotless formatting
           branch: ${{ github.head_ref }}
@@ -49,12 +54,12 @@ jobs:
           commit_options: '--signoff'
 
       - name: Update the changelog
-        uses: dangoslen/dependabot-changelog-helper@v3
+        uses: dangoslen/dependabot-changelog-helper@a841dcd1c4c526275c6ff16ef54ae96e304e258c # v3.11.1
         with:
           version: 'Unreleased 2.x'
 
       - name: Commit the changes
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: step-security/git-auto-commit-action@905c3cd6e9ed2b67b4d46ff401fdb6d745d0ff9d # v7.1.0
         with:
           commit_message: "Update changelog"
           branch: ${{ github.head_ref }}
